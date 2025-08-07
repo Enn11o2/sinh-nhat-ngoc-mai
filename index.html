@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chúc Mừng Sinh Nhật Ngọc Mai!</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+      color: #fff;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      text-align: center;
+    }
+    .emoji {
+      font-size: 5em;
+      animation: bounce 1s infinite;
+      margin-top: 40px;
+      z-index: 2;
+      position: relative;
+    }
+    h1 {
+      font-size: 3em;
+      color: #ffeb3b;
+      text-shadow: 2px 2px 4px #000;
+      position: relative;
+      z-index: 2;
+    }
+    p {
+      font-size: 1.5em;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+      z-index: 2;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    audio {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pháo hoa nền -->
+  <canvas id="fireworks"></canvas>
+
+  <!-- Nội dung chính -->
+  <div class="emoji">🎉🎂😂</div>
+  <h1>Chúc Mừng Sinh Nhật Ngọc Mai!</h1>
+
+  <p>Chúc Mai luôn <b>xinh đẹp – sớm thành phú bà</b>, <br>
+  <b>Nao bao nuôi t=))</b> 💸✨</p>
+
+
+  <!-- Nhạc mp3 -->
+  <audio autoplay loop controls>
+    <source src="sinhnhat.mp3" type="audio/mpeg">
+    Trình duyệt không hỗ trợ phát nhạc.
+  </audio>
+
+  <!-- Script pháo hoa -->
+  <script>
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.velocity = { x: (Math.random() - 0.5) * 6, y: (Math.random() - 0.5) * 8 };
+        this.alpha = 1;
+        this.friction = 0.98;
+      }
+      draw() {
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+      update() {
+        this.velocity.x *= this.friction;
+        this.velocity.y *= this.friction;
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        this.alpha -= 0.02;
+      }
+    }
+
+    class Firework {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height;
+        this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        this.particles = [];
+        this.exploded = false;
+      }
+      update() {
+        if (!this.exploded) {
+          this.y -= 4;
+          if (this.y < Math.random() * canvas.height / 2) this.explode();
+        }
+        this.particles.forEach((p, i) => {
+          p.update();
+          p.draw();
+          if (p.alpha <= 0) this.particles.splice(i, 1);
+        });
+      }
+      explode() {
+        this.exploded = true;
+        for (let i = 0; i < 50; i++) {
+          this.particles.push(new Particle(this.x, this.y, this.color));
+        }
+      }
+    }
+
+    let fireworks = [];
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (Math.random() < 0.05) fireworks.push(new Firework());
+      fireworks.forEach((f, i) => {
+        f.update();
+        if (f.exploded && f.particles.length === 0) fireworks.splice(i, 1);
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
